@@ -15,9 +15,13 @@ namespace DungeonCrawler
 
         public Edge(Room a, Room b)
         {
-            this.a = a;
+            this.A = a;
             this.b = b;            
         }
+
+       
+        internal Room A { get => a; set => a = value; }
+        internal Room B { get => b; set => b = value; }
 
         public void collapse()
         {
