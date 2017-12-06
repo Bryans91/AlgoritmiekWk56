@@ -8,38 +8,33 @@ namespace DungeonCrawler
 {
     class Room
     {
-        private Dictionary<char,Room> neighbors;
-        private int x, y;
+
+        private Dictionary<EdgeOptions, Edge> neighbors;
+        private bool _isUp;
+        private int _x, _y;
+
+        // Getters and setters
+        public bool IsUp { get => _isUp; set => _isUp = value; }
+        public int X { get => _x; set => _x = value; }
+        public int Y { get => _y; set => _y = value; }
+
         public Room(int x, int y)
         {
-            this.x = x;
-            this.y = y;
-            neighbors = new Dictionary<char, Room>();
+            this.X = x;
+            this.Y = y;
         }
 
-
-        public bool addNeighbor(char direction, Room room)
+        public bool addNeighbor(EdgeOptions direction, Edge edge)
         {
             if (!this.neighbors.ContainsKey(direction))
             {
-                this.neighbors.Add(direction, room);
+                this.neighbors.Add(direction, edge);
                 return true;
             }
             return false;
         }
 
-        public bool removeNeighbor(char direction,Room room)
-        {
-            if (this.neighbors.ContainsKey(direction))
-            {
-                this.neighbors.Remove(direction);
-                return true;
-            }
-            return false;
-        }
-
-
-        public Room getNeighbor(char key)
+        public Edge GetNeighbor(EdgeOptions key)
         {
             if (this.neighbors.ContainsKey(key))
             {
@@ -48,7 +43,7 @@ namespace DungeonCrawler
             return null;
         }
 
-        public int getNrOfNeighbors()
+        public int GetNrOfNeighbors()
         {
             return this.neighbors.Count;
         }
