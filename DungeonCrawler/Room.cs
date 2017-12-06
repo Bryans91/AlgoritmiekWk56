@@ -20,17 +20,36 @@ namespace DungeonCrawler
 
         public Room(int x, int y)
         {
+            this.neighbors = new Dictionary<EdgeOptions, Edge>();
             this.X = x;
             this.Y = y;
         }
 
-        public bool addNeighbor(EdgeOptions direction, Edge edge)
+        public bool addNeighbor(EdgeOptions direction, Room destination)
         {
             if (!this.neighbors.ContainsKey(direction))
             {
+                Edge edge = new Edge(this, destination, direction);
                 this.neighbors.Add(direction, edge);
+                reverseNeighbor(direction, edge);
                 return true;
             }
+            return false;
+        }
+
+        public bool reverseNeighbor(EdgeOptions direction, Edge edge)
+        {
+            Room b = this.get(direction);
+
+            int directionInt = (int)direction * - 1;
+            EdgeOptions reverseDirection = (EdgeOptions)directionInt;
+            if (!b.neighbors.ContainsKey(reverseDirection))
+            {
+                b.neighbors.Add(reverseDirection, edge);
+
+                return true;
+            }
+
             return false;
         }
 
@@ -51,6 +70,15 @@ namespace DungeonCrawler
         public int GetNrOfNeighbors()
         {
             return this.neighbors.Count;
+        }
+
+        public Room get(EdgeOptions direction)
+        {
+            if(!neighbors.TryGetValue(direction, out Edge edge))
+            {
+                return null;
+            }
+            return edge.getOpposite(this);
         }
 
     }
