@@ -66,14 +66,14 @@ namespace DungeonCrawler
                 Console.WriteLine(roomName + " Weight:" + randdd);
                 allRooms.Add(newRoom);
 
-                if(i == 0)
+                if (i == 0)
                 {
                     initialRowRoom = newRoom;
                     initialRoom = newRoom;
                     westRoom = newRoom;
                 }
 
-                if(xCount == 0)
+                if (xCount == 0)
                 {
                     northRoom = initialRowRoom;
                     initialRowRoom = newRoom;
@@ -85,7 +85,7 @@ namespace DungeonCrawler
                     newRoom.addNeighbor(EdgeOptions.WEST, westRoom);
                     westRoom = newRoom;
                 }
-                if(yCount > 0)
+                if (yCount > 0)
                 {
                     newRoom.addNeighbor(EdgeOptions.NORTH, northRoom);
                     northRoom = northRoom.get(EdgeOptions.EAST);
@@ -100,14 +100,14 @@ namespace DungeonCrawler
                 }
             }
         }
-        
+
         /**
          *  Seaches for stairs
          **/
         public int BreadthFirstSearch(Room root)
         {
             Queue<Room> queue = new Queue<Room>();
-            Dictionary<Room,Room> visited = new Dictionary<Room, Room>();
+            Dictionary<Room, Room> visited = new Dictionary<Room, Room>();
 
             Room previous = null;
             int steps = 0;
@@ -122,17 +122,17 @@ namespace DungeonCrawler
                 //add neighbors to queue
                 foreach (KeyValuePair<EdgeOptions, Edge> edge in current.GetNeighbors())
                 {
-                    if(edge.Value.A != current && visited.Values.Contains(edge.Value.A)) queue.Enqueue(edge.Value.A);
-                    if(edge.Value.B != current && visited.Values.Contains(edge.Value.B)) queue.Enqueue(edge.Value.B);
+                    if (edge.Value.A != current && visited.Values.Contains(edge.Value.A)) queue.Enqueue(edge.Value.A);
+                    if (edge.Value.B != current && visited.Values.Contains(edge.Value.B)) queue.Enqueue(edge.Value.B);
                 }
-            
+
                 visited.Add(current, previous);
                 previous = current;
 
                 if (current.IsUp)
                 {
                     Room key = previous;
-                    while(key != root)
+                    while (key != root)
                     {
                         if (visited.ContainsKey(key))
                         {
@@ -156,7 +156,7 @@ namespace DungeonCrawler
             List<Edge> closedEdges = new List<Edge>();
             List<Room> visitedRooms = new List<Room>();
             List<Room> allRoomsInFunction = allRooms;
-            
+
             visitedRooms.Add(root);
             Room current = root;
             allRoomsInFunction.Remove(current);
@@ -176,7 +176,7 @@ namespace DungeonCrawler
                 {
                     if (!closedEdges.Contains(we.edge) && (lowestWe == null || we.weight < lowestWe.weight))
                     {
-                        if(lowestWe == null && (!visitedRooms.Contains(we.edge.A) || !visitedRooms.Contains(we.edge.B)))
+                        if (lowestWe == null && (!visitedRooms.Contains(we.edge.A) || !visitedRooms.Contains(we.edge.B)))
                         {
                             lowestWe = we;
                         }
@@ -214,6 +214,97 @@ namespace DungeonCrawler
 
             return false;
         }
+
+        public bool ExplodeBryan(Room root, int collapseNr)
+        {
+
+            //https://www.youtube.com/watch?v=z1L3rMzG1_A
+            List<Edge> mst = new List<Edge>();
+            List<Room> allRooms = this.allRooms;
+            List<Room> visited = new List<Room>();
+
+            List<Edge> AllEdges = new List<Edge>();
+
+            //init vars
+            Room current;
+            root.tempLvl = 0;
+
+            int i = 0;
+            while (allRooms.Count > 0)
+            {
+                current = null;
+                //select lowest key and set as current 
+                foreach (Room r in allRooms)
+                {
+                    if (current == null || r.tempLvl < current.tempLvl) current = r;
+                }
+
+                //remove from loop
+                allRooms.Remove(current);
+
+                if (current.tempParent != null)
+                {
+                    Edge add = null;
+                    //add edge to mst
+                    foreach (Edge e in AllEdges)
+                    {
+                        if ((e.B == current || e.A == current) && (e.B == current.tempParent || e.A == current.tempParent))
+                        {
+                            if (add == null || add.Weight < e.Weight)
+                            {
+                                add = e;
+                            }
+                        }
+                    }
+
+                    mst.Add(add);
+                }
+
+
+                foreach (KeyValuePair<EdgeOptions, Edge> edge in current.GetNeighbors())
+                {
+                    Edge tempEdge = edge.Value;
+                    //get direction
+                    Room target;
+                    if (tempEdge.A == current)
+                    {
+                        target = tempEdge.B;
+                    }
+                    else
+                    {
+                        target = tempEdge.A;
+                    }
+
+                    if (tempEdge.Weight < target.tempLvl)
+                    {
+
+                        target.tempLvl = tempEdge.Weight;
+                        target.tempParent = current;
+                    }
+
+                    AllEdges.Add(tempEdge);
+
+                }
+                i++;
+                visited.Add(current);
+            }
+
+            //MST IS NON DELETE LIST
+
+            //reset all rooms
+            allRooms = this.allRooms;
+            foreach (Room r in allRooms)
+            {
+                r.tempLvl = 9999999;
+                r.tempParent = null;
+            }
+
+            //handle expl
+
+            return true;
+        }
+
+
 
     }
 }

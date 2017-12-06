@@ -20,6 +20,8 @@ namespace DungeonCrawler
         public int X { get => _x; set => _x = value; }
         public int Y { get => _y; set => _y = value; }
 
+        public int tempLvl = 99999999;
+        public Room tempParent = null;
         public Room(int x, int y, int monsterLevel, char roomName)
         {
             this.neighbors = new Dictionary<EdgeOptions, Edge>();
