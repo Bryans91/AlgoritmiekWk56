@@ -22,7 +22,6 @@ namespace DungeonCrawler
             this.y = y;
             rand = new Random();
             generateDungeon();
-            printDungeon();
         }
 
         private void generateDungeon()
@@ -78,10 +77,53 @@ namespace DungeonCrawler
                 }
             }
         }
-
-        private void printDungeon()
+        
+        /**
+         *  Seaches for stairs
+         **/
+        public int BreadthFirstSearch(Room root)
         {
+            Queue<Room> queue = new Queue<Room>();
+            Dictionary<Room,Room> visited = new Dictionary<Room, Room>();
+
+            Room previous = null;
+            int steps = 0;
+
+            queue.Enqueue(root);
+
+            while (queue.Count > 0)
+            {
+                Room current = queue.Dequeue();
+                if (current != null) continue;
+
+                //add neighbors to queue
+                foreach (KeyValuePair<EdgeOptions, Edge> edge in current.GetNeighbors())
+                {
+                    if(edge.Value.A != current && visited.Values.Contains(edge.Value.A)) queue.Enqueue(edge.Value.A);
+                    if(edge.Value.B != current && visited.Values.Contains(edge.Value.B)) queue.Enqueue(edge.Value.B);
+                }
             
+                visited.Add(current, previous);
+                previous = current;
+
+                if (current.IsUp)
+                {
+                    Room key = previous;
+                    while(key != root)
+                    {
+                        if (visited.ContainsKey(key))
+                        {
+                            key = visited[key];
+                            steps++;
+                        }
+                    }
+
+                    return steps;
+                }
+                //endwhile
+            }
+
+            return -1;
         }
     }
 }

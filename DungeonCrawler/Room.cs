@@ -61,6 +61,11 @@ namespace DungeonCrawler
             }
             return null;
         }
+        public Dictionary<EdgeOptions, Edge> GetNeighbors()
+        {
+            return this.neighbors;
+        }
+
 
         public int GetNrOfNeighbors()
         {
