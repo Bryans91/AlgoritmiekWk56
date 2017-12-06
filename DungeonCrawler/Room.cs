@@ -12,23 +12,26 @@ namespace DungeonCrawler
         private Dictionary<EdgeOptions, Edge> neighbors;
         private bool _isUp;
         private int _x, _y;
+        public int monsterLevel;
 
         // Getters and setters
         public bool IsUp { get => _isUp; set => _isUp = value; }
         public int X { get => _x; set => _x = value; }
         public int Y { get => _y; set => _y = value; }
 
-        public Room(int x, int y)
+        public Room(int x, int y, int monsterLevel)
         {
             this.neighbors = new Dictionary<EdgeOptions, Edge>();
             this.X = x;
             this.Y = y;
+            this.monsterLevel = monsterLevel;
         }
 
         public bool addNeighbor(EdgeOptions direction, Room destination)
         {
             if (!this.neighbors.ContainsKey(direction))
             {
+                Random rand = new Random();
                 Edge edge = new Edge(this, destination, direction);
                 this.neighbors.Add(direction, edge);
                 reverseNeighbor(direction, edge);

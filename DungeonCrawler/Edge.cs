@@ -16,7 +16,8 @@ namespace DungeonCrawler
         public Edge(Room a, Room b, EdgeOptions direction)
         {
             this.A = a;
-            this.b = b;            
+            this.b = b;
+            this.weight = a.monsterLevel + b.monsterLevel;
         }
 
         public int Weight { get => weight; set => weight = value; }

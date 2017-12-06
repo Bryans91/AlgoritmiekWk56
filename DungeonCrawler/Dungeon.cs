@@ -13,6 +13,7 @@ namespace DungeonCrawler
         private Room startRoom;
         private Room endRoom;
         private Room initialRoom;
+        public List<Room> allRooms = new List<Room>();
         private Random rand;
         private char[] chars = { 'n', 'o', 'w', 'z' };
 
@@ -22,6 +23,7 @@ namespace DungeonCrawler
             this.y = y;
             rand = new Random();
             generateDungeon();
+            Explode(initialRoom, 100000000);
         }
 
         private void generateDungeon()
@@ -39,7 +41,9 @@ namespace DungeonCrawler
             Room initialRowRoom = null;
             for (int i = 0; i < (this.x * this.y); i++)
             {
-                Room newRoom = new Room(xCount, yCount);
+                Room newRoom = new Room(xCount, yCount, rand.Next(1, 10));
+                allRooms.Add(newRoom);
+
                 if(i == 0)
                 {
                     initialRowRoom = newRoom;
@@ -66,11 +70,9 @@ namespace DungeonCrawler
                 }
 
                 xCount++;
-                System.Console.Write(newRoom.X + "," + newRoom.Y + " ");
 
                 if (xCount == this.x)
                 {
-                    System.Console.WriteLine();
                     xCount = 0;
                     yCount++;
                 }
@@ -125,78 +127,64 @@ namespace DungeonCrawler
             return -1;
         }
 
-        //public bool Explode(Room root , int collapseNr)
-        //{
-        //    //undeletable edges
-        //    List<Edge> smallestEdges = new List<Edge>();
-        //    List<KeyValuePair<int,Room>> visited = new List<KeyValuePair<int, Room>>();
+        public bool FireInTheHole()
+        {
 
-        //    //create priority list
-        //    List<KeyValuePair<int,Room>> priority = new List<KeyValuePair<int,Room>>();
+        }
 
-        //    //add first keyvalue to priorityqueue
-        //    priority.Add(new KeyValuePair<int, Room>(0, root));
-
-        //    //init current
-        //    KeyValuePair<int, Room> current;
-
-        //    while (priority.Count() > 0)
-        //    {
-        //        current = this.getPriority(priority);
-                
-
-        //        bool currentLower = false;
-        //        //check if in visited and weight is smaller
-        //        foreach(KeyValuePair<int,Room> pair in visited)
-        //        {
-        //            //if room equals current
-        //            if(pair.Value == current.Value)
-        //            {
-        //                if (pair.Key > current.Key)
-        //                {
-        //                    currentLower = true;
-        //                    priority.Remove(current);
-        //                }
-        //            }
-        //        }
-
-        //        if (!currentLower)
-        //        {
-        //            foreach (KeyValuePair<EdgeOptions, Edge> edge in current.Value.GetNeighbors())
-        //            {
-        //                Room tempRoom;
-        //                if (current.Value == edge.Value.A)
-        //                {
-        //                    tempRoom = edge.Value.A;
-        //                } else
-        //                {
-        //                    tempRoom = edge.Value.B;
-        //                }
-                                                   
-        //                KeyValuePair<int, Room> temp = new KeyValuePair<int, Room>(edge.Value.Weight + current.Key, tempRoom);
-
-        //            }
-        //        }
-
-        //    }
+        public bool Explode(Room root, int collapseNr)
+        {
+            //List<Edge> openEdges = new List<Edge>();
+            List<WeightEdge> openEdges = new List<WeightEdge>();
+            List<Edge> closedEdges = new List<Edge>();
+            List<Room> visitedRooms = new List<Room>();
+            List<Room> allRooms = new List<Room>();
             
-            
+            visitedRooms.Add(root);
+            Room current = root;
+
+            while (allRooms.Count < 0)
+            {
+                Dictionary<EdgeOptions, Edge> neighbours = current.GetNeighbors();
+
+                foreach (KeyValuePair<EdgeOptions, Edge> edge in current.GetNeighbors())
+                {
+                    if (!closedEdges.Contains(edge.Value))
+                    {
+                        openEdges.Add(new WeightEdge(edge.Value, edge.Value.Weight, current));
+                    }
+                }
 
 
-        //    return true;
-        //}
+                WeightEdge lowestWe = null;
+                foreach (WeightEdge we in openEdges)
+                {
+                    if ((lowestWe == null || we.weight < lowestWe.weight))
+                    {
+                        lowestWe = we;
+                    }
+                }
+                if (lowestWe != null)
+                {
+                    closedEdges.Add(lowestWe.edge);
+                    current = lowestWe.edge.getOpposite(lowestWe.origin);
+                    allRooms.Remove(current);
+                    openEdges.Remove(lowestWe);
+                } else
+                {
+                    current = null;
+                }
+            }
 
+            System.Console.Write("I WANT TO BREAK FREEEE");
+            // Add all edges of C to openlist
 
-        //private KeyValuePair<int,Room> getPriority(List<KeyValuePair<int,Room>> priority)
-        //{
-        //    KeyValuePair<int, Room> lowest = new KeyValuePair<int, Room>(-1,null);
-        //    foreach(KeyValuePair<int, Room> pair in priority)
-        //    {
-        //        if(lowest.Key < 0 || lowest.Key > pair.Key) lowest = pair;
-        //    }
-            
-        //    return lowest;
-        //}
+            // add C -> D to closed
+
+            // Add all edges of D to openList (except D -> C, already in closed)
+
+            return false;
+        }
 
     }
 }
