@@ -13,18 +13,20 @@ namespace DungeonCrawler
         private bool _isUp;
         private int _x, _y;
         public int monsterLevel;
+        public char roomName;
 
         // Getters and setters
         public bool IsUp { get => _isUp; set => _isUp = value; }
         public int X { get => _x; set => _x = value; }
         public int Y { get => _y; set => _y = value; }
 
-        public Room(int x, int y, int monsterLevel)
+        public Room(int x, int y, int monsterLevel, char roomName)
         {
             this.neighbors = new Dictionary<EdgeOptions, Edge>();
             this.X = x;
             this.Y = y;
             this.monsterLevel = monsterLevel;
+            this.roomName = roomName;
         }
 
         public bool addNeighbor(EdgeOptions direction, Room destination)

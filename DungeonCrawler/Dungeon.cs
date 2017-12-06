@@ -24,6 +24,24 @@ namespace DungeonCrawler
             rand = new Random();
             generateDungeon();
             Explode(initialRoom, 100000000);
+
+            this.x = x;
+            this.y = y;
+            rand = new Random();
+            generateDungeon();
+            Explode(initialRoom, 100000000);
+
+            this.x = x;
+            this.y = y;
+            rand = new Random();
+            generateDungeon();
+            Explode(initialRoom, 100000000);
+
+            this.x = x;
+            this.y = y;
+            rand = new Random();
+            generateDungeon();
+            Explode(initialRoom, 100000000);
         }
 
         private void generateDungeon()
@@ -41,7 +59,11 @@ namespace DungeonCrawler
             Room initialRowRoom = null;
             for (int i = 0; i < (this.x * this.y); i++)
             {
-                Room newRoom = new Room(xCount, yCount, rand.Next(1, 10));
+                char roomName = 'a';
+                roomName += (char)i;
+                int randdd = rand.Next(0, 10);
+                Room newRoom = new Room(xCount, yCount, i, roomName);
+                Console.WriteLine(roomName + " Weight:" + randdd);
                 allRooms.Add(newRoom);
 
                 if(i == 0)
@@ -127,53 +149,52 @@ namespace DungeonCrawler
             return -1;
         }
 
-        public bool FireInTheHole()
-        {
-
-        }
-
-        public bool Explode(Room root, int collapseNr)
+        public bool ExplodeBenny(Room root, int collapseNr)
         {
             //List<Edge> openEdges = new List<Edge>();
             List<WeightEdge> openEdges = new List<WeightEdge>();
             List<Edge> closedEdges = new List<Edge>();
             List<Room> visitedRooms = new List<Room>();
-            List<Room> allRooms = new List<Room>();
+            List<Room> allRoomsInFunction = allRooms;
             
             visitedRooms.Add(root);
             Room current = root;
+            allRoomsInFunction.Remove(current);
 
-            while (allRooms.Count < 0)
+            while (allRoomsInFunction.Count > 0)
             {
                 Dictionary<EdgeOptions, Edge> neighbours = current.GetNeighbors();
 
                 foreach (KeyValuePair<EdgeOptions, Edge> edge in current.GetNeighbors())
                 {
-                    if (!closedEdges.Contains(edge.Value))
-                    {
-                        openEdges.Add(new WeightEdge(edge.Value, edge.Value.Weight, current));
-                    }
+                    openEdges.Add(new WeightEdge(edge.Value, edge.Value.Weight, current));
                 }
 
 
                 WeightEdge lowestWe = null;
                 foreach (WeightEdge we in openEdges)
                 {
-                    if ((lowestWe == null || we.weight < lowestWe.weight))
+                    if (!closedEdges.Contains(we.edge) && (lowestWe == null || we.weight < lowestWe.weight))
                     {
-                        lowestWe = we;
+                        if(lowestWe == null && (!visitedRooms.Contains(we.edge.A) || !visitedRooms.Contains(we.edge.B)))
+                        {
+                            lowestWe = we;
+                        }
+                        else if (!visitedRooms.Contains(we.edge.A) || !visitedRooms.Contains(we.edge.B))
+                        {
+                            lowestWe = we;
+                        }
                     }
                 }
-                if (lowestWe != null)
-                {
-                    closedEdges.Add(lowestWe.edge);
-                    current = lowestWe.edge.getOpposite(lowestWe.origin);
-                    allRooms.Remove(current);
-                    openEdges.Remove(lowestWe);
-                } else
-                {
-                    current = null;
-                }
+
+                closedEdges.Add(lowestWe.edge);
+                current = lowestWe.edge.getOpposite(lowestWe.origin);
+                //visitedRooms.Add(current);
+                visitedRooms.Add(lowestWe.edge.A);
+                visitedRooms.Add(lowestWe.edge.B);
+                allRoomsInFunction.Remove(current);
+                openEdges.Remove(lowestWe);
+                Console.WriteLine(lowestWe.weight + ": " + lowestWe.edge.A.roomName + " -> " + lowestWe.edge.B.roomName);
             }
 
             System.Console.Write("I WANT TO BREAK FREEEE");
@@ -182,6 +203,14 @@ namespace DungeonCrawler
             // add C -> D to closed
 
             // Add all edges of D to openList (except D -> C, already in closed)
+
+            System.Console.WriteLine();
+            System.Console.WriteLine();
+
+            foreach (Edge printEdge in closedEdges)
+            {
+                Console.WriteLine(printEdge.A.roomName + " <-> " + printEdge.B.roomName + " = " + printEdge.Weight);
+            }
 
             return false;
         }

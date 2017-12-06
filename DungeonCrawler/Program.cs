@@ -10,7 +10,7 @@ namespace DungeonCrawler
     {
         static void Main(string[] args)
         {
-            Dungeon dngcrwlr = new Dungeon(25, 25);
+            Dungeon dngcrwlr = new Dungeon(5, 5);
             System.Console.ReadKey();
 
         }
