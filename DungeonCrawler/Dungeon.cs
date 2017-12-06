@@ -23,25 +23,10 @@ namespace DungeonCrawler
             this.y = y;
             rand = new Random();
             generateDungeon();
-            Explode(initialRoom, 100000000);
+            this.ExplodeBenny(initialRoom, 100000000);
+            this.ExplodeBryan(initialRoom, 100000000);
 
-            this.x = x;
-            this.y = y;
-            rand = new Random();
-            generateDungeon();
-            Explode(initialRoom, 100000000);
-
-            this.x = x;
-            this.y = y;
-            rand = new Random();
-            generateDungeon();
-            Explode(initialRoom, 100000000);
-
-            this.x = x;
-            this.y = y;
-            rand = new Random();
-            generateDungeon();
-            Explode(initialRoom, 100000000);
+           
         }
 
         private void generateDungeon()
@@ -62,8 +47,8 @@ namespace DungeonCrawler
                 char roomName = 'a';
                 roomName += (char)i;
                 int randdd = rand.Next(0, 10);
-                Room newRoom = new Room(xCount, yCount, i, roomName);
-                Console.WriteLine(roomName + " Weight:" + randdd);
+                Room newRoom = new Room(xCount, yCount, randdd, roomName);
+               
                 allRooms.Add(newRoom);
 
                 if (i == 0)
@@ -254,12 +239,12 @@ namespace DungeonCrawler
                             {
                                 add = e;
                             }
+                            AllEdges.Remove(e);
                         }
                     }
 
                     mst.Add(add);
                 }
-
 
                 foreach (KeyValuePair<EdgeOptions, Edge> edge in current.GetNeighbors())
                 {
@@ -275,15 +260,13 @@ namespace DungeonCrawler
                         target = tempEdge.A;
                     }
 
+                    //if a path is shorter than current temp add to list
                     if (tempEdge.Weight < target.tempLvl)
                     {
-
                         target.tempLvl = tempEdge.Weight;
                         target.tempParent = current;
-                    }
-
-                    AllEdges.Add(tempEdge);
-
+                        AllEdges.Add(tempEdge);
+                    } 
                 }
                 i++;
                 visited.Add(current);
@@ -291,6 +274,10 @@ namespace DungeonCrawler
 
             //MST IS NON DELETE LIST
 
+            foreach (Edge printEdge in mst)
+            {
+                Console.WriteLine(printEdge.A.roomName + " <-> " + printEdge.B.roomName + " = " + printEdge.Weight);
+            }
             //reset all rooms
             allRooms = this.allRooms;
             foreach (Room r in allRooms)
