@@ -19,7 +19,8 @@ namespace DungeonCrawler
             this.b = b;            
         }
 
-       
+        public int Weight { get => weight; set => weight = value; }
+
         internal Room A { get => a; set => a = value; }
         internal Room B { get => b; set => b = value; }
 

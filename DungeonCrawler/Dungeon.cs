@@ -80,7 +80,7 @@ namespace DungeonCrawler
                 //    }
                     
                 //}
-                
+               
 
                
 
@@ -140,6 +140,86 @@ namespace DungeonCrawler
 
             return -1;
         }
+
+
+
+
+        //public bool Explode(Room root , int collapseNr)
+        //{
+        //    //undeletable edges
+        //    List<Edge> smallestEdges = new List<Edge>();
+        //    List<KeyValuePair<int,Room>> visited = new List<KeyValuePair<int, Room>>();
+
+        //    //create priority list
+        //    List<KeyValuePair<int,Room>> priority = new List<KeyValuePair<int,Room>>();
+
+        //    //add first keyvalue to priorityqueue
+        //    priority.Add(new KeyValuePair<int, Room>(0, root));
+
+        //    //init current
+        //    KeyValuePair<int, Room> current;
+
+        //    while (priority.Count() > 0)
+        //    {
+        //        current = this.getPriority(priority);
+                
+
+        //        bool currentLower = false;
+        //        //check if in visited and weight is smaller
+        //        foreach(KeyValuePair<int,Room> pair in visited)
+        //        {
+        //            //if room equals current
+        //            if(pair.Value == current.Value)
+        //            {
+        //                if (pair.Key > current.Key)
+        //                {
+        //                    currentLower = true;
+        //                    priority.Remove(current);
+        //                }
+        //            }
+        //        }
+
+        //        if (!currentLower)
+        //        {
+        //            foreach (KeyValuePair<EdgeOptions, Edge> edge in current.Value.GetNeighbors())
+        //            {
+        //                Room tempRoom;
+        //                if (current.Value == edge.Value.A)
+        //                {
+        //                    tempRoom = edge.Value.A;
+        //                } else
+        //                {
+        //                    tempRoom = edge.Value.B;
+        //                }
+                                                   
+        //                KeyValuePair<int, Room> temp = new KeyValuePair<int, Room>(edge.Value.Weight + current.Key, tempRoom);
+
+        //            }
+        //        }
+
+        //    }
+            
+            
+
+
+        //    return true;
+        //}
+
+
+        //private KeyValuePair<int,Room> getPriority(List<KeyValuePair<int,Room>> priority)
+        //{
+        //    KeyValuePair<int, Room> lowest = new KeyValuePair<int, Room>(-1,null);
+        //    foreach(KeyValuePair<int, Room> pair in priority)
+        //    {
+        //        if(lowest.Key < 0 || lowest.Key > pair.Key) lowest = pair;
+        //    }
+            
+        //    return lowest;
+        //}
+
+
+
+
 
 
 
