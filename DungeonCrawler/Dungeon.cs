@@ -12,7 +12,7 @@ namespace DungeonCrawler
         private int y;
         private Room startRoom;
         private Room endRoom;
-        private Room[,] dungeon;
+        private Room initialRoom;
         private Random rand;
         private char[] chars = { 'n', 'o', 'w', 'z' };
 
@@ -21,86 +21,67 @@ namespace DungeonCrawler
             this.x = x;
             this.y = y;
             rand = new Random();
+            generateDungeon();
+            printDungeon();
         }
 
         private void generateDungeon()
         {
-           
-            this.startRoom = new Room(-1,-1);
-            this.endRoom = new Room(-2,-2);
-            this.dungeon = new Room[this.x,this.y];
+            //this.startRoom = new Room(0, 0);
+            //this.endRoom = new Room(49, 49);
+            //this.dungeon = new Room[this.x,this.y];
 
             //generate field
             int xCount = 0;
             int yCount = 0;
+
+            Room westRoom = null;
+            Room northRoom = null;
+            Room initialRowRoom = null;
             for (int i = 0; i < (this.x * this.y); i++)
             {
-                dungeon[xCount, yCount] = new Room(xCount,yCount);
-                xCount++;
-         
-                if(xCount == this.x)
+                Room newRoom = new Room(xCount, yCount);
+                if(i == 0)
                 {
-                    xCount = 0;
-                    yCount++;
-                }       
-            }
+                    initialRowRoom = newRoom;
+                    initialRoom = newRoom;
+                    westRoom = newRoom;
+                }
 
-            
-           
-            xCount = 0;
-            yCount = 0;
-            Room current = null;
-            Room temp = null;
+                if(xCount == 0)
+                {
+                    northRoom = initialRowRoom;
+                    initialRowRoom = newRoom;
+                    westRoom = newRoom;
+                }
 
-            
-            for (int i = 0; i < (this.x * this.y); i++)
-            {
-                current = dungeon[xCount, yCount];
-                
-              //set all delete 1 random
+                if (xCount > 0)
+                {
+                    newRoom.addNeighbor(EdgeOptions.WEST, westRoom);
+                    westRoom = newRoom;
+                }
+                if(yCount > 0)
+                {
+                    newRoom.addNeighbor(EdgeOptions.NORTH, northRoom);
+                    northRoom = northRoom.get(EdgeOptions.EAST);
+                }
 
+                xCount++;
+                System.Console.Write(newRoom.X + "," + newRoom.Y + " ");
 
-
-                //if(current.getNrOfNeighbors() == 0)
-                //{
-                //    if(yCount == 0)
-                //    {
-                //        //no north
-                //    }
-
-                //    if(yCount == this.y)
-                //    {
-                //        //no south
-                //    }
-
-                //    if(xCount == 0)
-                //    {
-                //        //no west
-                //    }
-                //    if(xCount == this.x)
-                //    {
-                //        //no east
-                //    }
-                    
-                //}
-                
-
-               
 
                 if (xCount == this.x)
                 {
+                    System.Console.WriteLine();
                     xCount = 0;
                     yCount++;
                 }
             }
-
-
-
-
-
-
         }
 
-
+        private void printDungeon()
+        {
+            
+        }
     }
 }

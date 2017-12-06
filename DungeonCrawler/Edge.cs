@@ -13,15 +13,28 @@ namespace DungeonCrawler
         private Room b;
         private bool collapsed = false;
 
-        public Edge(Room a, Room b)
+        public Edge(Room a, Room b, EdgeOptions direction)
         {
             this.a = a;
-            this.b = b;            
+            this.b = b;          
         }
 
         public void collapse()
         {
             this.collapsed = true;
+        }
+
+        public Room getOpposite(Room room)
+        {
+            if(room == a)
+            {
+                return b;
+            } else if (room == b)
+            {
+                return a;
+            }
+
+            return null;
         }
 
         public bool isCollapsed()
