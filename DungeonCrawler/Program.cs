@@ -12,7 +12,6 @@ namespace DungeonCrawler
         {
             Dungeon dngcrwlr = new Dungeon(25, 25);
 
-
             System.Console.ReadKey();
 
         }

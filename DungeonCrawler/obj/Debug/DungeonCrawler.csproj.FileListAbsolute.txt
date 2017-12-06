@@ -4,3 +4,10 @@ c:\users\bryan\documents\visual studio 2015\Projects\DungeonCrawler\DungeonCrawl
 c:\users\bryan\documents\visual studio 2015\Projects\DungeonCrawler\DungeonCrawler\obj\Debug\DungeonCrawler.csprojResolveAssemblyReference.cache
 c:\users\bryan\documents\visual studio 2015\Projects\DungeonCrawler\DungeonCrawler\obj\Debug\DungeonCrawler.exe
 c:\users\bryan\documents\visual studio 2015\Projects\DungeonCrawler\DungeonCrawler\obj\Debug\DungeonCrawler.pdb
+C:\Users\Aapie\Desktop\School\ALG\DungeonCrawler\bin\Debug\DungeonCrawler.exe.config
+C:\Users\Aapie\Desktop\School\ALG\DungeonCrawler\bin\Debug\DungeonCrawler.exe
+C:\Users\Aapie\Desktop\School\ALG\DungeonCrawler\bin\Debug\DungeonCrawler.pdb
+C:\Users\Aapie\Desktop\School\ALG\DungeonCrawler\obj\Debug\DungeonCrawler.csprojResolveAssemblyReference.cache
+C:\Users\Aapie\Desktop\School\ALG\DungeonCrawler\obj\Debug\DungeonCrawler.csproj.CoreCompileInputs.cache
+C:\Users\Aapie\Desktop\School\ALG\DungeonCrawler\obj\Debug\DungeonCrawler.exe
+C:\Users\Aapie\Desktop\School\ALG\DungeonCrawler\obj\Debug\DungeonCrawler.pdb
