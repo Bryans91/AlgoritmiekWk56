@@ -14,6 +14,7 @@ namespace DungeonCrawler
         private Room endRoom;
         private Room initialRoom;
         public List<Room> allRooms = new List<Room>();
+        public List<Edge> allEdges = new List<Edge>();
         private Random rand;
         private char[] chars = { 'n', 'o', 'w', 'z' };
 
@@ -23,8 +24,8 @@ namespace DungeonCrawler
             this.y = y;
             rand = new Random();
             generateDungeon();
-            this.ExplodeBenny(initialRoom, 100000000);
-            this.ExplodeBryan(initialRoom, 100000000);
+         //   this.ExplodeBenny(initialRoom, 100000000);
+            this.collapseEdges(initialRoom, 10,0);
 
            
         }
@@ -48,7 +49,7 @@ namespace DungeonCrawler
                 roomName += (char)i;
                 int randdd = rand.Next(0, 10);
                 Room newRoom = new Room(xCount, yCount, randdd, roomName);
-               
+                Edge tempEdge = null;
                 allRooms.Add(newRoom);
 
                 if (i == 0)
@@ -67,14 +68,15 @@ namespace DungeonCrawler
 
                 if (xCount > 0)
                 {
-                    newRoom.addNeighbor(EdgeOptions.WEST, westRoom);
+                    tempEdge = newRoom.addNeighbor(EdgeOptions.WEST, westRoom);
                     westRoom = newRoom;
                 }
                 if (yCount > 0)
                 {
-                    newRoom.addNeighbor(EdgeOptions.NORTH, northRoom);
+                    tempEdge = newRoom.addNeighbor(EdgeOptions.NORTH, northRoom);
                     northRoom = northRoom.get(EdgeOptions.EAST);
                 }
+                if (tempEdge != null) this.allEdges.Add(tempEdge);
 
                 xCount++;
 
@@ -200,15 +202,15 @@ namespace DungeonCrawler
             return false;
         }
 
-        public bool ExplodeBryan(Room root, int collapseNr)
+        public List<Edge> mstBryan(Room root)
         {
 
-            //https://www.youtube.com/watch?v=z1L3rMzG1_A
+            
             List<Edge> mst = new List<Edge>();
             List<Room> allRooms = this.allRooms;
             List<Room> visited = new List<Room>();
 
-            List<Edge> AllEdges = new List<Edge>();
+            List<Edge> tempAllEdges = new List<Edge>();
 
             //init vars
             Room current;
@@ -231,7 +233,7 @@ namespace DungeonCrawler
                 {
                     Edge add = null;
                     //add edge to mst
-                    foreach (Edge e in AllEdges)
+                    foreach (Edge e in tempAllEdges)
                     {
                         if ((e.B == current || e.A == current) && (e.B == current.tempParent || e.A == current.tempParent))
                         {
@@ -239,7 +241,7 @@ namespace DungeonCrawler
                             {
                                 add = e;
                             }
-                            AllEdges.Remove(e);
+                           
                         }
                     }
 
@@ -265,7 +267,7 @@ namespace DungeonCrawler
                     {
                         target.tempLvl = tempEdge.Weight;
                         target.tempParent = current;
-                        AllEdges.Add(tempEdge);
+                        tempAllEdges.Add(tempEdge);
                     } 
                 }
                 i++;
@@ -274,10 +276,6 @@ namespace DungeonCrawler
 
             //MST IS NON DELETE LIST
 
-            foreach (Edge printEdge in mst)
-            {
-                Console.WriteLine(printEdge.A.roomName + " <-> " + printEdge.B.roomName + " = " + printEdge.Weight);
-            }
             //reset all rooms
             allRooms = this.allRooms;
             foreach (Room r in allRooms)
@@ -287,11 +285,49 @@ namespace DungeonCrawler
             }
 
             //handle expl
-
-            return true;
+            return mst;
         }
 
 
+        public bool collapseEdges(Room root,int nrOfCollapse,int floor)
+        {
+            //get edgelists
+            List<Edge> mst = this.mstBryan(root);
+            List<Edge> tempAll = this.allEdges;
+
+            //SHUFFLE EDGELIST
+            this.Shuffle(tempAll);
+
+            int i = 0;
+            foreach (Edge e in tempAll)
+            {
+                //TODO:: add check for floors later
+                if(!e.isCollapsed() && !mst.Contains(e) && i < nrOfCollapse)
+                {
+                    e.collapse();
+                    i++;
+                }
+            }
+      
+            if (i > 0) return true;
+            return false;
+        }
+
+        //Fisher yates shuffle
+        public void Shuffle<T>(IList<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = this.rand.Next(n + 1);
+                T value = list[k];
+                list[k] = list[n];
+                list[n] = value;
+            }
+        }
 
     }
+
+        
 }

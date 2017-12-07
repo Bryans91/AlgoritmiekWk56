@@ -31,17 +31,17 @@ namespace DungeonCrawler
             this.roomName = roomName;
         }
 
-        public bool addNeighbor(EdgeOptions direction, Room destination)
+        public Edge addNeighbor(EdgeOptions direction, Room destination)
         {
+            Edge edge = null;
             if (!this.neighbors.ContainsKey(direction))
             {
                 Random rand = new Random();
-                Edge edge = new Edge(this, destination, direction);
+                edge = new Edge(this, destination, direction);
                 this.neighbors.Add(direction, edge);
                 reverseNeighbor(direction, edge);
-                return true;
             }
-            return false;
+            return edge;
         }
 
         public bool reverseNeighbor(EdgeOptions direction, Edge edge)
