@@ -66,10 +66,17 @@ namespace DungeonCrawler
 
         private void movePlayer(EdgeOptions direction)
         {
-            playerPosition.roomName = playerPosition.originalName;
-            playerPosition = playerPosition.get(direction);
-            playerPosition.roomName = 'P';
-            printMap();
+            if (playerPosition.GetNeighbor(direction).isCollapsed())
+            {
+                Console.WriteLine("Leuk geprobeerd Bryan.. Ja dit zit er al in!");
+            }
+            else
+            {
+                playerPosition.roomName = playerPosition.originalName;
+                playerPosition = playerPosition.get(direction);
+                playerPosition.roomName = 'P';
+                printMap();
+            }
         }
 
         List<bool> northEast = new List<bool>();
