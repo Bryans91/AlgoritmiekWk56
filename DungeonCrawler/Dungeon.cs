@@ -56,6 +56,10 @@ namespace DungeonCrawler
                 {
                     Console.WriteLine("Steps to steps: " + BreadthFirstSearch(playerPosition));
                 }
+                else if (keyInfo.Key == ConsoleKey.Enter)
+                {
+                    printMap(true); // CLEAR!
+                }
             }
         }
 
@@ -67,7 +71,7 @@ namespace DungeonCrawler
             printMap();
         }
 
-        private void printMap()
+        private void printMap(bool clear = false)
         {
             Console.Clear();
 
@@ -77,6 +81,14 @@ namespace DungeonCrawler
             {
                 xCount++;
 
+                if (clear)
+                {
+                    tempRoom.roomName = tempRoom.originalName;
+                    if (tempRoom == playerPosition)
+                    {
+                        tempRoom.roomName = 'P';
+                    }
+                }
                 Console.Write(tempRoom.roomName + " ");
                 if(xCount == this.x)
                 {
@@ -229,6 +241,9 @@ namespace DungeonCrawler
                         }
                     }
 
+                    // DEBUG PRINTER
+                    playerPosition.roomName = 'P';
+                    upStairs.roomName = 'U';
                     printMap(); // Dit kun je weghalen om te zien welke rooms hij scant
                     return steps;
                 }
