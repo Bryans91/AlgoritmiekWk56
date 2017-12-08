@@ -71,6 +71,7 @@ namespace DungeonCrawler
             printMap();
         }
 
+        List<bool> northEast = new List<bool>();
         private void printMap(bool clear = false)
         {
             Console.Clear();
@@ -89,9 +90,40 @@ namespace DungeonCrawler
                         tempRoom.roomName = 'P';
                     }
                 }
-                Console.Write(tempRoom.roomName + " ");
-                if(xCount == this.x)
+
+                Console.Write(tempRoom.roomName);
+
+                // draw edges
+                if (tempRoom.get(EdgeOptions.EAST) != null && tempRoom.GetNeighbor(EdgeOptions.EAST).isCollapsed()) {
+                    Console.Write(" ~ ");
+                } else if (tempRoom.get(EdgeOptions.EAST) != null)
                 {
+                    Console.Write(" - ");
+                }
+
+                if (tempRoom.get(EdgeOptions.SOUTH) != null && tempRoom.GetNeighbor(EdgeOptions.SOUTH).isCollapsed())
+                {
+                    northEast.Add(true);
+                }
+                else if (tempRoom.get(EdgeOptions.SOUTH) != null)
+                {
+                    northEast.Add(false);
+                }
+
+                if (xCount == this.x)
+                {
+                    Console.WriteLine();
+                    foreach (bool collapsedEdge in northEast)
+                    {
+                        if(collapsedEdge)
+                        {
+                            Console.Write("~   ");
+                        } else
+                        {
+                            Console.Write("|   ");
+                        }
+                    }
+                    northEast.Clear();
                     Console.WriteLine();
                     xCount = 0;
                 }
