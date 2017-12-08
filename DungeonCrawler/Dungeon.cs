@@ -25,6 +25,7 @@ namespace DungeonCrawler
             this.y = y;
             rand = new Random();
             generateDungeon(start, end);
+            printMap();
          //   this.ExplodeBenny(initialRoom, 100000000);
             this.collapseEdges(initialRoom, 10,0);
             gameLoop();
@@ -213,11 +214,8 @@ namespace DungeonCrawler
                     newRoom.IsUp = true;
                 }
 
-                Console.Write(newRoom.roomName + " ");
-
                 if (xCount == this.x)
                 {
-                    Console.WriteLine();
                     xCount = 0;
                     yCount++;
                 }
