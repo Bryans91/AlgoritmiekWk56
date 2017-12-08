@@ -13,24 +13,81 @@ namespace DungeonCrawler
         private Room startRoom;
         private Room endRoom;
         private Room initialRoom;
+        private Room playerPosition;
+        private Room upStairs;
         public List<Room> allRooms = new List<Room>();
         public List<Edge> allEdges = new List<Edge>();
         private Random rand;
-        private char[] chars = { 'n', 'o', 'w', 'z' };
 
-        public Dungeon(int x, int y)
+        public Dungeon(int x, int y, int start, int end)
         {
             this.x = x;
             this.y = y;
             rand = new Random();
-            generateDungeon();
+            generateDungeon(start, end);
          //   this.ExplodeBenny(initialRoom, 100000000);
             this.collapseEdges(initialRoom, 10,0);
-
+            gameLoop();
            
         }
 
-        private void generateDungeon()
+        private void gameLoop()
+        {
+            while (true)
+            {
+                ConsoleKeyInfo keyInfo = Console.ReadKey();
+                if (keyInfo.Key == ConsoleKey.UpArrow && playerPosition.Y != 0)
+                {
+                    movePlayer(EdgeOptions.NORTH);
+                }
+                else if (keyInfo.Key == ConsoleKey.DownArrow && playerPosition.Y != this.y - 1)
+                {
+                    movePlayer(EdgeOptions.SOUTH);
+                }
+                else if (keyInfo.Key == ConsoleKey.LeftArrow && playerPosition.X != 0)
+                {
+                    movePlayer(EdgeOptions.WEST);
+                }
+                else if (keyInfo.Key == ConsoleKey.RightArrow && playerPosition.X != this.x - 1)
+                {
+                    movePlayer(EdgeOptions.EAST);
+                }
+                else if (keyInfo.Key == ConsoleKey.Spacebar)
+                {
+                    Console.WriteLine("Steps to steps: " + BreadthFirstSearch(playerPosition));
+                }
+            }
+        }
+
+        private void movePlayer(EdgeOptions direction)
+        {
+            playerPosition.roomName = playerPosition.originalName;
+            playerPosition = playerPosition.get(direction);
+            playerPosition.roomName = 'P';
+            printMap();
+        }
+
+        private void printMap()
+        {
+            Console.Clear();
+
+            int xCount = 0;
+            Room tempRoom = initialRoom;
+            for (int i = 0; i < (this.x * this.y); i++)
+            {
+                xCount++;
+
+                Console.Write(tempRoom.roomName + " ");
+                if(xCount == this.x)
+                {
+                    Console.WriteLine();
+                    xCount = 0;
+                }
+                tempRoom = tempRoom.NextRoom;
+            }
+        }
+
+        private void generateDungeon(int start, int end)
         {
             //this.startRoom = new Room(0, 0);
             //this.endRoom = new Room(49, 49);
@@ -40,15 +97,33 @@ namespace DungeonCrawler
             int xCount = 0;
             int yCount = 0;
 
+            int randX = rand.Next(0, this.x);
+            int randY = rand.Next(0, this.y);
+
             Room westRoom = null;
             Room northRoom = null;
             Room initialRowRoom = null;
+            Room previousRoom = null;
             for (int i = 0; i < (this.x * this.y); i++)
             {
-                char roomName = 'a';
-                roomName += (char)i;
+                char roomName = 'O';
                 int randdd = rand.Next(0, 10);
                 Room newRoom = new Room(xCount, yCount, randdd, roomName);
+
+                if (i == start)
+                {
+                    startRoom = newRoom;
+                    playerPosition = newRoom;
+                    newRoom.roomName = 'P';
+                    newRoom.originalName = 'S';
+                }
+                else if (i == end)
+                {
+                    endRoom = newRoom;
+                    newRoom.roomName = 'X';
+                    newRoom.originalName = 'X';
+                }
+
                 Edge tempEdge = null;
                 allRooms.Add(newRoom);
 
@@ -57,6 +132,12 @@ namespace DungeonCrawler
                     initialRowRoom = newRoom;
                     initialRoom = newRoom;
                     westRoom = newRoom;
+                    previousRoom = newRoom;
+                } else
+                {
+                    newRoom.PreviousRoom = previousRoom;
+                    previousRoom.NextRoom = newRoom;
+                    previousRoom = newRoom;
                 }
 
                 if (xCount == 0)
@@ -80,8 +161,19 @@ namespace DungeonCrawler
 
                 xCount++;
 
+                if (newRoom.X == randX && newRoom.Y == randY)
+                {
+                    newRoom.roomName = 'U';
+                    newRoom.originalName = 'U';
+                    upStairs = newRoom;
+                    newRoom.IsUp = true;
+                }
+
+                Console.Write(newRoom.roomName + " ");
+
                 if (xCount == this.x)
                 {
+                    Console.WriteLine();
                     xCount = 0;
                     yCount++;
                 }
@@ -101,20 +193,29 @@ namespace DungeonCrawler
 
             queue.Enqueue(root);
 
+            Console.WriteLine("Should be a number: " + queue.Count);
+
             while (queue.Count > 0)
             {
                 Room current = queue.Dequeue();
-                if (current != null) continue;
+                if (current == null || visited.ContainsKey(current))
+                {
+                    continue;
+                }
+
+                Console.WriteLine("Checking room: " + current.roomName);
 
                 //add neighbors to queue
                 foreach (KeyValuePair<EdgeOptions, Edge> edge in current.GetNeighbors())
                 {
-                    if (edge.Value.A != current && visited.Values.Contains(edge.Value.A)) queue.Enqueue(edge.Value.A);
-                    if (edge.Value.B != current && visited.Values.Contains(edge.Value.B)) queue.Enqueue(edge.Value.B);
+                    if (edge.Value.A != current && !visited.Values.Contains(edge.Value.A)) queue.Enqueue(edge.Value.A);
+                    if (edge.Value.B != current && !visited.Values.Contains(edge.Value.B)) queue.Enqueue(edge.Value.B);
                 }
 
                 visited.Add(current, previous);
                 previous = current;
+
+                current.roomName = 'B';
 
                 if (current.IsUp)
                 {
@@ -128,6 +229,7 @@ namespace DungeonCrawler
                         }
                     }
 
+                    printMap(); // Dit kun je weghalen om te zien welke rooms hij scant
                     return steps;
                 }
                 //endwhile

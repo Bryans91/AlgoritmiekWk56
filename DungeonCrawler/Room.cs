@@ -14,11 +14,16 @@ namespace DungeonCrawler
         private int _x, _y;
         public int monsterLevel;
         public char roomName;
+        public char originalName;
+        Room _nextRoom;
+        Room _previousRoom;
 
         // Getters and setters
         public bool IsUp { get => _isUp; set => _isUp = value; }
         public int X { get => _x; set => _x = value; }
         public int Y { get => _y; set => _y = value; }
+        internal Room NextRoom { get => _nextRoom; set => _nextRoom = value; }
+        internal Room PreviousRoom { get => _previousRoom; set => _previousRoom = value; }
 
         public int tempLvl = 99999999;
         public Room tempParent = null;
@@ -29,6 +34,7 @@ namespace DungeonCrawler
             this.Y = y;
             this.monsterLevel = monsterLevel;
             this.roomName = roomName;
+            this.originalName = roomName;
         }
 
         public Edge addNeighbor(EdgeOptions direction, Room destination)
