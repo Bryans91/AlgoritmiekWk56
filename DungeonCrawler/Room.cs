@@ -17,6 +17,9 @@ namespace DungeonCrawler
         public char originalName;
         Room _nextRoom;
         Room _previousRoom;
+        private int _costToDestination = 99999999;
+        private int _costFromStart = 99999999;
+        Room _breadCrumb;
 
         // Getters and setters
         public bool IsUp { get => _isUp; set => _isUp = value; }
@@ -24,6 +27,9 @@ namespace DungeonCrawler
         public int Y { get => _y; set => _y = value; }
         internal Room NextRoom { get => _nextRoom; set => _nextRoom = value; }
         internal Room PreviousRoom { get => _previousRoom; set => _previousRoom = value; }
+        internal Room BreadCrumb { get => _breadCrumb; set => _breadCrumb = value; }
+        public int CostToDestination { get => _costToDestination; set => _costToDestination = value; }
+        public int CostFromStart { get => _costFromStart; set => _costFromStart = value; }
 
         public int tempLvl = 99999999;
         public Room tempParent = null;

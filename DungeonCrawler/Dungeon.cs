@@ -19,6 +19,9 @@ namespace DungeonCrawler
         public List<Edge> allEdges = new List<Edge>();
         private Random rand;
 
+        List<Room> openList = new List<Room>();
+        List<Room> closedList = new List<Room>();
+
         public Dungeon(int x, int y, int start, int end)
         {
             this.x = x;
@@ -27,7 +30,7 @@ namespace DungeonCrawler
             generateDungeon(start, end);
             printMap();
          //   this.ExplodeBenny(initialRoom, 100000000);
-            this.collapseEdges(initialRoom, 10,0);
+            this.collapseEdges(initialRoom, 5,0);
             gameLoop();
            
         }
@@ -53,13 +56,22 @@ namespace DungeonCrawler
                 {
                     movePlayer(EdgeOptions.EAST);
                 }
-                else if (keyInfo.Key == ConsoleKey.Spacebar)
+                else if (keyInfo.Key == ConsoleKey.B) // PRESS B FOR BFS
                 {
                     Console.WriteLine("Steps to steps: " + BreadthFirstSearch(playerPosition));
                 }
-                else if (keyInfo.Key == ConsoleKey.Enter)
+                else if (keyInfo.Key == ConsoleKey.E) // SHOW ENEMIES
                 {
-                    printMap(true); // CLEAR!
+                    printMap("enemies");
+                }
+                else if (keyInfo.Key == ConsoleKey.D)
+                {
+                    getPath(playerPosition, endRoom);
+                    printMap();
+                }
+                else if (keyInfo.Key == ConsoleKey.Enter) // PRESS ENTER TO CLEAR MAP
+                {
+                    printMap("clear"); // CLEAR!
                 }
             }
         }
@@ -79,18 +91,18 @@ namespace DungeonCrawler
             }
         }
 
-        List<bool> northEast = new List<bool>();
-        private void printMap(bool clear = false)
+        private void printMap(string option = "")
         {
             Console.Clear();
 
+            List<bool> northEast = new List<bool>();
             int xCount = 0;
             Room tempRoom = initialRoom;
             for (int i = 0; i < (this.x * this.y); i++)
             {
                 xCount++;
 
-                if (clear)
+                if (option.Equals("clear"))
                 {
                     tempRoom.roomName = tempRoom.originalName;
                     if (tempRoom == playerPosition)
@@ -98,8 +110,14 @@ namespace DungeonCrawler
                         tempRoom.roomName = 'P';
                     }
                 }
-
-                Console.Write(tempRoom.roomName);
+                if (option.Equals("enemies"))
+                {
+                    Console.Write(tempRoom.monsterLevel);
+                }
+                else
+                {
+                    Console.Write(tempRoom.roomName);
+                }
 
                 // draw edges
                 if (tempRoom.get(EdgeOptions.EAST) != null && tempRoom.GetNeighbor(EdgeOptions.EAST).isCollapsed()) {
@@ -138,6 +156,147 @@ namespace DungeonCrawler
                 tempRoom = tempRoom.NextRoom;
             }
         }
+
+        public Room getPath(Room start, Room destination)
+        {
+
+            // RESET
+            Room resetRoom = initialRoom;
+            for (int i = 0; i < (this.x * this.y); i++)
+            {
+                resetRoom.CostFromStart = 99999999;
+                resetRoom = resetRoom.NextRoom;
+            }
+
+            bool destinationReached = false;
+            int steps = 0;
+
+            openList.Add(start);
+            //openList[start->getX()][start->getY()] = start;
+
+            Room current = null;
+            start.CostFromStart = 0;
+
+            bool foundOpen = true;
+            int currentCost = -1;
+
+            while (!destinationReached)
+            {
+                foreach (Room inOpen in openList)
+                {
+                    if(inOpen.CostFromStart < currentCost || currentCost < 1)
+                    {
+                        currentCost = inOpen.CostFromStart;
+                        current = inOpen;
+                        foundOpen = true;
+                    }
+                }
+                if (!foundOpen)
+                {
+                    return null;
+                }
+
+                openList.Remove(current);
+                closedList.Add(current);
+
+                if (current == destination)
+                {
+                    destinationReached = true;
+                }
+                else
+                {
+                    Room toCheck = null;
+                    for (int i = 0; i < 4; i++)
+                    {
+                        switch (i)
+                        {
+                            case 0:
+                                if (current.Y != 0 && !playerPosition.GetNeighbor(EdgeOptions.NORTH).isCollapsed())
+                                {
+                                    toCheck = current.get(EdgeOptions.NORTH);
+                                }
+                                break;
+                            case 1:
+                                if (current.Y != this.y - 1 && !playerPosition.GetNeighbor(EdgeOptions.SOUTH).isCollapsed())
+                                {
+                                    toCheck = current.get(EdgeOptions.SOUTH);
+                                }
+                                break;
+                            case 2:
+                                if (current.X != 0 && !playerPosition.GetNeighbor(EdgeOptions.WEST).isCollapsed())
+                                {
+                                    toCheck = current.get(EdgeOptions.WEST);
+                                }
+                                break;
+                            case 3:
+                                if (current.X != this.x - 1 && !playerPosition.GetNeighbor(EdgeOptions.EAST).isCollapsed())
+                                {
+                                    toCheck = current.get(EdgeOptions.EAST);
+                                }
+                                break;
+                        }
+
+                        // If open space and check if not in closed list
+                        if (toCheck != null && toCheck == destination)
+                        {
+                            destinationReached = true;
+                            toCheck.BreadCrumb = current;
+                        }
+                        else if (toCheck != null)
+                        {
+                            checkRoom(current, toCheck, destination);
+                        }
+                    }
+                }
+                steps++;
+            }
+
+            // Reverse!
+            int pathLength = 0;
+            Room lastCrumb = destination;
+            if (destinationReached)
+            {
+                Room crumb = destination;
+                while (crumb != null && crumb != start)
+                {
+                    lastCrumb = crumb;
+                    crumb = crumb.BreadCrumb;
+                    pathLength++;
+                    crumb.roomName = 'C';
+                }
+            }
+            //if (pathLength < 3)
+            //{
+            //    return destination;
+            //}
+
+            return lastCrumb;
+        }
+
+        public void checkRoom(Room current, Room toCheck, Room destination)
+        {
+            if (closedList.Contains(toCheck))
+            {
+                return;
+            }
+
+            // If new path is shorter or is not in open list.
+            int currentCost = current.CostFromStart;
+
+            int oldCost = toCheck.CostFromStart;
+            //int toGoal = getDistance(toCheck, destination); // IDDDDKKKKKK
+
+            // Check if totalcost is lower than current cost of toCheck
+            if ((currentCost + 1 < oldCost || !openList.Contains(toCheck)) && current != initialRoom)
+            {
+                Console.WriteLine("RoomLevel" + current.monsterLevel + " CurrentCost: " + currentCost + " OldCost: " + oldCost);
+                toCheck.CostFromStart = currentCost + 20 + toCheck.monsterLevel; // IDDDKKKKKKK
+                //toCheck->setCostToDestination(currentCost + 100 + toGoal);
+                openList.Add(toCheck);
+                toCheck.BreadCrumb = current;
+            }
+        }
+
 
         private void generateDungeon(int start, int end)
         {
