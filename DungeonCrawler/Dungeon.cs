@@ -30,8 +30,7 @@ namespace DungeonCrawler
             generateDungeon(start, end);
           
          //   this.ExplodeBenny(initialRoom, 100000000);
-            this.collapseEdges(initialRoom, 999999,0);
-            this.collapseEdges(initialRoom, 999999, 0);
+            this.collapseEdges(initialRoom, 25,0);
             printMap();
             gameLoop();
            
@@ -69,6 +68,11 @@ namespace DungeonCrawler
                 else if (keyInfo.Key == ConsoleKey.D)
                 {
                     getPath(playerPosition, endRoom);
+                    printMap();
+                }
+                else if (keyInfo.Key == ConsoleKey.G)
+                {
+                    collapseEdges(playerPosition, 5, 0);
                     printMap();
                 }
                 else if (keyInfo.Key == ConsoleKey.Enter) // PRESS ENTER TO CLEAR MAP
