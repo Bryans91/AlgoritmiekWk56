@@ -30,8 +30,8 @@ namespace DungeonCrawler
             generateDungeon(start, end);
           
          //   this.ExplodeBenny(initialRoom, 100000000);
-            this.collapseEdges(initialRoom, 999999,0);
-            this.collapseEdges(initialRoom, 999999, 0);
+            this.collapseEdges(initialRoom, 10,0);
+        //     this.collapseEdges(initialRoom, 999999, 0);
             printMap();
             gameLoop();
            
@@ -398,59 +398,48 @@ namespace DungeonCrawler
         public int BreadthFirstSearch(Room root)
         {
             Queue<Room> queue = new Queue<Room>();
-            Dictionary<Room, Room> visited = new Dictionary<Room, Room>();
+            List<Room> visited = new List<Room>();
+            Dictionary<Room, int> distance = new Dictionary<Room, int>();
+            bool found = false;
+            int steps = -1;
 
-            Room previous = null;
-            int steps = 0;
-
+            distance.Add(root, 0);
             queue.Enqueue(root);
 
-            Console.WriteLine("Should be a number: " + queue.Count);
-
-            while (queue.Count > 0)
+            while (queue.Count > 0 && !found)
             {
                 Room current = queue.Dequeue();
-                if (current == null || visited.ContainsKey(current))
-                {
-                    continue;
-                }
+                visited.Add(current);
 
-                Console.WriteLine("Checking room: " + current.roomName);
-
-                //add neighbors to queue
                 foreach (KeyValuePair<EdgeOptions, Edge> edge in current.GetNeighbors())
                 {
-                    if (edge.Value.A != current && !visited.Values.Contains(edge.Value.A)) queue.Enqueue(edge.Value.A);
-                    if (edge.Value.B != current && !visited.Values.Contains(edge.Value.B)) queue.Enqueue(edge.Value.B);
-                }
-
-                visited.Add(current, previous);
-                previous = current;
-
-                current.roomName = 'B';
-
-                if (current.IsUp)
-                {
-                    Room key = previous;
-                    while (key != root)
+                    //duplicate because rooms suck
+                    if (edge.Value.A != current && !visited.Contains(edge.Value.A) && !queue.Contains(edge.Value.A))
                     {
-                        if (visited.ContainsKey(key))
+                        if (edge.Value.A.IsUp)
                         {
-                            key = visited[key];
-                            steps++;
+                            found = true;
+                            steps = distance[current];
                         }
-                    }
+                        distance.Add(edge.Value.A, distance[current] + 1);
+                        queue.Enqueue(edge.Value.A);
 
-                    // DEBUG PRINTER
-                    playerPosition.roomName = 'P';
-                    upStairs.roomName = 'U';
-                    printMap(); // Dit kun je weghalen om te zien welke rooms hij scant
-                    return steps;
+                    }
+                    else if (edge.Value.B != current && !visited.Contains(edge.Value.B) && !queue.Contains(edge.Value.B))
+                    {
+                        if (edge.Value.A.IsUp)
+                        {
+                            found = true;
+                            steps = distance[current];
+                        }
+                        distance.Add(edge.Value.B, distance[current] + 1);
+                        queue.Enqueue(edge.Value.B);
+                    }
                 }
-                //endwhile
+
             }
 
-            return -1;
+            return steps;
         }
 
         public List<Edge> ExplodeBenny(Room root, int collapseNr)
