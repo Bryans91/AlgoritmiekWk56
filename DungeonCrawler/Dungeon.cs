@@ -28,9 +28,11 @@ namespace DungeonCrawler
             this.y = y;
             rand = new Random();
             generateDungeon(start, end);
-            printMap();
+          
          //   this.ExplodeBenny(initialRoom, 100000000);
-            this.collapseEdges(initialRoom, 5,0);
+            this.collapseEdges(initialRoom, 999999,0);
+            this.collapseEdges(initialRoom, 999999, 0);
+            printMap();
             gameLoop();
            
         }
@@ -362,13 +364,15 @@ namespace DungeonCrawler
                 {
                     tempEdge = newRoom.addNeighbor(EdgeOptions.WEST, westRoom);
                     westRoom = newRoom;
+                    if (tempEdge != null) this.allEdges.Add(tempEdge);
                 }
                 if (yCount > 0)
                 {
                     tempEdge = newRoom.addNeighbor(EdgeOptions.NORTH, northRoom);
                     northRoom = northRoom.get(EdgeOptions.EAST);
+                    if (tempEdge != null) this.allEdges.Add(tempEdge);
                 }
-                if (tempEdge != null) this.allEdges.Add(tempEdge);
+              
 
                 xCount++;
 
@@ -449,7 +453,7 @@ namespace DungeonCrawler
             return -1;
         }
 
-        public bool ExplodeBenny(Room root, int collapseNr)
+        public List<Edge> ExplodeBenny(Room root, int collapseNr)
         {
             //List<Edge> openEdges = new List<Edge>();
             List<WeightEdge> openEdges = new List<WeightEdge>();
@@ -507,20 +511,14 @@ namespace DungeonCrawler
             System.Console.WriteLine();
             System.Console.WriteLine();
 
-            foreach (Edge printEdge in closedEdges)
-            {
-                Console.WriteLine(printEdge.A.roomName + " <-> " + printEdge.B.roomName + " = " + printEdge.Weight);
-            }
-
-            return false;
+   
+            return closedEdges;
         }
 
         public List<Edge> mstBryan(Room root)
         {
-
-            
             List<Edge> mst = new List<Edge>();
-            List<Room> allRooms = this.allRooms;
+            List<Room> tempAllRooms = new List<Room>(this.allRooms);
             List<Room> visited = new List<Room>();
 
             List<Edge> tempAllEdges = new List<Edge>();
@@ -530,17 +528,17 @@ namespace DungeonCrawler
             root.tempLvl = 0;
 
             int i = 0;
-            while (allRooms.Count > 0)
+            while (tempAllRooms.Count > 0)
             {
                 current = null;
                 //select lowest key and set as current 
-                foreach (Room r in allRooms)
+                foreach (Room r in tempAllRooms)
                 {
                     if (current == null || r.tempLvl < current.tempLvl) current = r;
                 }
 
                 //remove from loop
-                allRooms.Remove(current);
+                tempAllRooms.Remove(current);
 
                 if (current.tempParent != null)
                 {
@@ -548,16 +546,19 @@ namespace DungeonCrawler
                     //add edge to mst
                     foreach (Edge e in tempAllEdges)
                     {
-                        if ((e.B == current || e.A == current) && (e.B == current.tempParent || e.A == current.tempParent))
-                        {
-                            if (add == null || add.Weight < e.Weight)
+                       
+                            if ((e.B == current || e.A == current) && (e.B == current.tempParent || e.A == current.tempParent))
                             {
-                                add = e;
-                            }
-                           
-                        }
-                    }
 
+                                if (add == null || add.Weight < e.Weight)
+                                {
+                                    add = e;
+                                }
+
+
+                            }
+                      
+                    }
                     mst.Add(add);
                 }
 
@@ -574,9 +575,9 @@ namespace DungeonCrawler
                     {
                         target = tempEdge.A;
                     }
-
+              
                     //if a path is shorter than current temp add to list
-                    if (tempEdge.Weight < target.tempLvl)
+                    if (tempEdge.Weight < target.tempLvl )
                     {
                         target.tempLvl = tempEdge.Weight;
                         target.tempParent = current;
@@ -590,8 +591,8 @@ namespace DungeonCrawler
             //MST IS NON DELETE LIST
 
             //reset all rooms
-            allRooms = this.allRooms;
-            foreach (Room r in allRooms)
+            tempAllRooms = this.allRooms;
+            foreach (Room r in tempAllRooms)
             {
                 r.tempLvl = 9999999;
                 r.tempParent = null;
@@ -606,22 +607,24 @@ namespace DungeonCrawler
         {
             //get edgelists
             List<Edge> mst = this.mstBryan(root);
-            List<Edge> tempAll = this.allEdges;
-
+            List<Edge> tempAll = allEdges;
+          
             //SHUFFLE EDGELIST
             this.Shuffle(tempAll);
 
             int i = 0;
+            int y = 0;
             foreach (Edge e in tempAll)
             {
                 //TODO:: add check for floors later
                 if(!e.isCollapsed() && !mst.Contains(e) && i < nrOfCollapse)
-                {
+                {    
                     e.collapse();
                     i++;
                 }
+                y++;
             }
-      
+    
             if (i > 0) return true;
             return false;
         }
