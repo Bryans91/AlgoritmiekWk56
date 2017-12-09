@@ -577,7 +577,7 @@ namespace DungeonCrawler
                     }
               
                     //if a path is shorter than current temp add to list
-                    if (tempEdge.Weight < target.tempLvl )
+                    if (tempEdge.Weight < target.tempLvl && !tempEdge.isCollapsed())
                     {
                         target.tempLvl = tempEdge.Weight;
                         target.tempParent = current;
