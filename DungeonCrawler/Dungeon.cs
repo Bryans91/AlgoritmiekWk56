@@ -299,7 +299,7 @@ namespace DungeonCrawler
         {
             List<Room> tempAllRooms = new List<Room>(this.allRooms);
 
-            var previous = new Dictionary<Room, Room>();
+            Dictionary<Room,Room> previous = new Dictionary<Room, Room>();
             List<Room> shortestPath = null;
             Dictionary<Room,int> distances = new Dictionary<Room, int>();
 
