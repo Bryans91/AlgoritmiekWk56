@@ -68,8 +68,11 @@ namespace DungeonCrawler
                 }
                 else if (keyInfo.Key == ConsoleKey.D)
                 {
+                    // getPath(playerPosition, endRoom);
+
                     getPath(playerPosition, endRoom);
                     printMap();
+                    Console.WriteLine("Shortest path(Dijkstra)");
                 }
                 else if (keyInfo.Key == ConsoleKey.G)
                 {
@@ -176,7 +179,7 @@ namespace DungeonCrawler
             }
         }
 
-        public Room getPath(Room start, Room destination)
+        public Room getPathBenny(Room start, Room destination)
         {
 
             // RESET
@@ -290,6 +293,92 @@ namespace DungeonCrawler
             //}
 
             return lastCrumb;
+        }
+
+        public List<Room> getPath(Room root, Room target)
+        {
+            List<Room> tempAllRooms = new List<Room>(this.allRooms);
+
+            var previous = new Dictionary<Room, Room>();
+            List<Room> shortestPath = null;
+            Dictionary<Room,int> distances = new Dictionary<Room, int>();
+
+            List<Room> priority = new List<Room>();
+
+            //set initial situation
+            foreach (Room room in tempAllRooms)
+            {
+                if (room == root)
+                {
+                    distances[room] = 0;
+                }
+                else
+                {
+                    distances[room] = int.MaxValue;
+                }
+
+                priority.Add(room);
+            }
+
+            while (priority.Count > 0)
+            {
+                //sort by smallest value
+                priority.Sort((x, y) => distances[x] - distances[y]);
+
+                Room smallest = priority[0];
+                priority.Remove(smallest);
+
+                //check if reached
+                if (smallest == target)
+                {
+                    //Backtrack
+                    shortestPath = new List<Room>();
+                    while (previous.ContainsKey(smallest))
+                    {
+                        shortestPath.Add(smallest);
+                        smallest = previous[smallest];
+                    }
+
+                    break;
+                }
+
+                //check neighbors and set values
+                foreach (KeyValuePair<EdgeOptions, Edge> edge in smallest.GetNeighbors())
+                {
+                    //exclude collapsed edges
+                    if (!edge.Value.isCollapsed())
+                    {
+                        int weight = distances[smallest] + edge.Value.Weight;
+
+                        //get target room
+                        Room neighborTarget = null;
+                        if (edge.Value.A == smallest)
+                        {
+                            neighborTarget = edge.Value.B;
+                        }
+                        else
+                        {
+                            neighborTarget = edge.Value.A;
+                        }
+
+                        if (weight < distances[neighborTarget])
+                        {
+                            //get target room
+                            distances[neighborTarget] = weight;
+                            //update
+                            previous[neighborTarget] = smallest;
+                        }
+                    }
+                }
+
+            }
+            
+            foreach(Room r in shortestPath)
+            {
+                r.roomName = 'C';
+            }
+
+            return shortestPath;
         }
 
         public void checkRoom(Room current, Room toCheck, Room destination)
