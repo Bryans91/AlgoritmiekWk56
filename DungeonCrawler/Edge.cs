@@ -12,6 +12,7 @@ namespace DungeonCrawler
         private Room a;
         private Room b;
         private bool collapsed = false;
+        private bool invisible = false;
 
         public Edge(Room a, Room b, EdgeOptions direction)
         {
@@ -21,7 +22,7 @@ namespace DungeonCrawler
         }
 
         public int Weight { get => weight; set => weight = value; }
-
+        public bool Invisible { get => invisible; set => invisible = value; }
         internal Room A { get => a; set => a = value; }
         internal Room B { get => b; set => b = value; }
 

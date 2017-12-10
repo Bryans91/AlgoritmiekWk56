@@ -29,7 +29,8 @@ namespace DungeonCrawler
             rand = new Random();
             generateDungeon(start, end);
           
-            this.collapseEdges(initialRoom, 10,0);
+            //INITIAL EXPLODE
+            this.collapseEdges(initialRoom, 40 ,0,true);
 
             printMap();
             gameLoop();
@@ -72,8 +73,16 @@ namespace DungeonCrawler
                 }
                 else if (keyInfo.Key == ConsoleKey.G)
                 {
-                    collapseEdges(playerPosition, 5, 0);
+                    bool colSucces = collapseEdges(playerPosition, 5, 0);
                     printMap();
+                    if (colSucces)
+                    {
+                        Console.WriteLine("De kerker schudt op zijn grondvesten, alle tegenstanders in de kamer zijn verslagen! Een donderend geluid maakt duidelijk dat gedeeltes van de kerker zijn ingestort...");
+                    }
+                    else
+                    {
+                        Console.WriteLine("Je vreest dat een extra handgranaat een cruciale passage zal blokkeren.Het is beter om deze niet meer te gebruiken op deze verdieping.");
+                    }
                 }
                 else if (keyInfo.Key == ConsoleKey.Enter) // PRESS ENTER TO CLEAR MAP
                 {
@@ -96,6 +105,7 @@ namespace DungeonCrawler
                 printMap();
             }
         }
+
 
         private void printMap(string option = "")
         {
@@ -126,9 +136,11 @@ namespace DungeonCrawler
                 }
 
                 // draw edges
-                if (tempRoom.get(EdgeOptions.EAST) != null && tempRoom.GetNeighbor(EdgeOptions.EAST).isCollapsed()) {
+                if (tempRoom.get(EdgeOptions.EAST) != null && tempRoom.GetNeighbor(EdgeOptions.EAST).isCollapsed())
+                {
                     Console.Write(" ~ ");
-                } else if (tempRoom.get(EdgeOptions.EAST) != null)
+                }
+                else if (tempRoom.get(EdgeOptions.EAST) != null)
                 {
                     Console.Write(" - ");
                 }
@@ -147,10 +159,11 @@ namespace DungeonCrawler
                     Console.WriteLine();
                     foreach (bool collapsedEdge in northEast)
                     {
-                        if(collapsedEdge)
+                        if (collapsedEdge)
                         {
                             Console.Write("~   ");
-                        } else
+                        }
+                        else
                         {
                             Console.Write("|   ");
                         }
@@ -596,7 +609,7 @@ namespace DungeonCrawler
         }
 
 
-        public bool collapseEdges(Room root,int nrOfCollapse,int floor)
+        public bool collapseEdges(Room root,int nrOfCollapse,int floor , bool init = false)
         {
             //get edgelists
             List<Edge> mst = this.mstBryan(root);
@@ -607,17 +620,21 @@ namespace DungeonCrawler
 
             int i = 0;
             int y = 0;
+            List<Edge> initToRemove = new List<Edge>();
             foreach (Edge e in tempAll)
             {
                 //TODO:: add check for floors later
                 if(!e.isCollapsed() && !mst.Contains(e) && i < nrOfCollapse)
-                {    
+                {
+                    if (init) e.Invisible = true;
                     e.collapse();
+                    
                     i++;
                 }
                 y++;
             }
-    
+
+
             if (i > 0) return true;
             return false;
         }
